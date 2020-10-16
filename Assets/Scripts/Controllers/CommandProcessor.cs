@@ -14,7 +14,7 @@ public class CommandProcessor
 
     public String Parse(String pCmdStr)
     {
-        String strResult = "Do not understand"; ;
+        string strResult = "Do not understand";
         pCmdStr = pCmdStr.ToLower();
         String[] parts = pCmdStr.Split(' '); // tokenise the command
         Location nextLocale;

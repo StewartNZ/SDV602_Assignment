@@ -6,21 +6,14 @@ public class TextInput : MonoBehaviour {
 	InputField input;
 	//InputField.SubmitEvent se;
 	//InputField.OnChangeEvent ce;
-	public Text output;
+	public Text locationName;
+	public Text locationStory;
 
 	// Use this for initialization
 	void Start () {
-        output.text = "Welcome, Type 'help' to see avaliable inputs";
+        locationStory.text = "Welcome, Type 'help' to see avaliable inputs";
 
         input = this.GetComponent<InputField>();
-		//se = new InputField.SubmitEvent();
-		//se.AddListener(SubmitInput);
-        /*
-		ce = new InputField.OnChangeEvent();
-		ce.AddListener(ChangeInput);
-		*/
-        //input.onEndEdit = se;
-        //input.onValueChanged = ce;
 
     }
 	
@@ -36,7 +29,7 @@ public class TextInput : MonoBehaviour {
 
 	private void SubmitInput(string arg0)
 	{
-		string currentText = output.text;
+		string currentText = locationStory.text;
 
         //  DO THIS LATER 
          CommandProcessor aCmd = new CommandProcessor();
