@@ -75,28 +75,34 @@ public static class GameModel
     {
         if (prGameView == GameView.MainGame)
         {
-            ConnectGameModel.mainGameView.SetActive(true);
-            ConnectGameModel.inventoryView.SetActive(false);
-            ConnectGameModel.mapView.SetActive(false);
+            ConnectGameModel.MainCanvas.SetActive(true);
+            ConnectGameModel.MapCanvas.SetActive(false);
 
             currentView = GameView.MainGame;
+            Debug.Log("MainView");
         }
         else if (prGameView == GameView.Inventory)
         {
-            ConnectGameModel.mainGameView.SetActive(false);
-            ConnectGameModel.inventoryView.SetActive(true);
-            ConnectGameModel.mapView.SetActive(false);
+            //ConnectGameModel.mainGameView.SetActive(false);
+            //ConnectGameModel.inventoryView.SetActive(true);
+            //ConnectGameModel.mapView.SetActive(false);
 
             currentView = GameView.Inventory;
+            Debug.Log("MainView");
         }
         else if (prGameView == GameView.Map)
         {
-            ConnectGameModel.mainGameView.SetActive(false);
-            ConnectGameModel.inventoryView.SetActive(false);
-            ConnectGameModel.mapView.SetActive(true);
+            ConnectGameModel.MainCanvas.SetActive(false);
+            ConnectGameModel.MapCanvas.SetActive(true);
 
             currentView = GameView.Map;
+            Debug.Log("MainView");
         }
+    }
+
+    public static void ToggleHelp()
+    {
+        ConnectGameModel.HelpCommands.SetActive(ConnectGameModel.HelpCommands.activeInHierarchy ? false : true);
     }
 
 }

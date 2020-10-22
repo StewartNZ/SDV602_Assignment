@@ -12,9 +12,14 @@ public class CommandProcessor
     {
     }
 
-    public String Parse(String pCmdStr)
+    public Dictionary<string, string> Parse(String pCmdStr)
     {
-        string strResult = "Do not understand";
+        Dictionary<string, string> output = new Dictionary<string, string>()
+        {
+            {"name", GameModel.currentLocale.Name},
+            {"story", "Do not understand"}
+        };
+
         pCmdStr = pCmdStr.ToLower();
         String[] parts = pCmdStr.Split(' '); // tokenise the command
         Location nextLocale;
@@ -28,9 +33,9 @@ public class CommandProcessor
                     case "current":
                         switch (parts[1])
                         {
-                            case "location":
-                                Debug.Log("Telling Current Location");
-                                strResult = GameModel.currentLocale.ToString();
+                            case "story":
+                                Debug.Log("Telling Current Story");
+                                output["story"] = GameModel.currentLocale.Story;
                                 break;
 
                             default:
@@ -45,11 +50,12 @@ public class CommandProcessor
                                 Debug.Log("Got go North");
                                 nextLocale = GameModel.currentLocale.getLocation("North");
                                 if (nextLocale == null)
-                                    strResult = "Sorry can't go North\n" + GameModel.currentLocale.Name + " " + GameModel.currentLocale.Story;
+                                    output["story"] = "Sorry can't go north";
                                 else
                                 {
                                     GameModel.currentLocale = nextLocale;
-                                    strResult = GameModel.currentLocale.Name + " " + GameModel.currentLocale.Story;
+                                    output["name"] = GameModel.currentLocale.Name;
+                                    output["story"] = GameModel.currentLocale.Story;
                                 }
 
                                 break;
@@ -59,12 +65,13 @@ public class CommandProcessor
                                 nextLocale = GameModel.currentLocale.getLocation("South");
                                 if (nextLocale == null)
                                 {
-                                    strResult = "Sorry can't go South\n" + GameModel.currentLocale.Name + " " + GameModel.currentLocale.Story;
+                                    output["story"] = "Sorry can't go South";
                                 }
                                 else
                                 {
                                     GameModel.currentLocale = nextLocale;
-                                    strResult = GameModel.currentLocale.Name + " " + GameModel.currentLocale.Story;
+                                    output["name"] = GameModel.currentLocale.Name;
+                                    output["story"] = GameModel.currentLocale.Story;
                                 }
                                 break;
 
@@ -73,12 +80,13 @@ public class CommandProcessor
                                 nextLocale = GameModel.currentLocale.getLocation("East");
                                 if (nextLocale == null)
                                 {
-                                    strResult = "Sorry can't go East\n" + GameModel.currentLocale.Name + " " + GameModel.currentLocale.Story;
+                                    output["story"] = "Sorry can't go East";
                                 }
                                 else
                                 {
                                     GameModel.currentLocale = nextLocale;
-                                    strResult = GameModel.currentLocale.Name + " " + GameModel.currentLocale.Story;
+                                    output["name"] = GameModel.currentLocale.Name;
+                                    output["story"] = GameModel.currentLocale.Story;
                                 }
                                 break;
 
@@ -87,18 +95,19 @@ public class CommandProcessor
                                 nextLocale = GameModel.currentLocale.getLocation("West");
                                 if (nextLocale == null)
                                 {
-                                    strResult = "Sorry can't go West\n" + GameModel.currentLocale.Name + " " + GameModel.currentLocale.Story;
+                                    output["story"] = "Sorry can't go West";
                                 }
                                 else
                                 {
                                     GameModel.currentLocale = nextLocale;
-                                    strResult = GameModel.currentLocale.Name + " " + GameModel.currentLocale.Story;
+                                    output["name"] = GameModel.currentLocale.Name;
+                                    output["story"] = GameModel.currentLocale.Story;
                                 }
                                 break;
 
                             default:
                                 Debug.Log("Do not know how to go there");
-                                strResult = "Do not know how to go there";
+                                output["story"] = "Do not know how to go there";
                                 break;
                         }// end switch
                         break;
@@ -108,31 +117,32 @@ public class CommandProcessor
                         {
                             case "inventory":
                                 Debug.Log("Showing Inventory");
-                                strResult = "Showing Inventory";
+                                output["story"] = "Showing Inventory";
                                 GameModel.ShowView(GameModel.GameView.Inventory);
                                 break;
 
                             case "map":
                                 Debug.Log("Showing Map");
-                                strResult = "Showing Map";
+                                output["story"] = "Showing Map";
                                 GameModel.ShowView(GameModel.GameView.Map);
                                 break;
 
                             default:
                                 Debug.Log("Do not know how to show that");
-                                strResult = "Do not know how to show that";
+                                output["story"] = "Do not know how to show that";
                                 break;
                         }
                         break;
 
                     case "help":
-                        Debug.Log("Showing Help");
-                        strResult = "Commands: \ncurrent (location) \ngo (south/west/north/east) \nshow (inventory/map) \nhelp";
+                        Debug.Log("Toggling Help");
+                        output["story"] = "Showing help";
+                        GameModel.ToggleHelp();
                         break;
 
                     default:
-                        Debug.Log("134Do not understand");
-                        strResult = "Do not understand";
+                        Debug.Log("Do not understand");
+                        output["story"] = "Do not understand";
                         break;
 
                 }// end switch
@@ -145,12 +155,12 @@ public class CommandProcessor
                         if (GameModel.currentView == GameModel.GameView.MainGame)
                         {
                             Debug.Log("Cannot go back further");
-                            strResult = "Cannot go back further";
+                            output["story"] = "Cannot go back further";
                         }
                         else
                         {
                             Debug.Log("Returning to Main View");
-                            strResult = GameModel.currentLocale.ToString();
+                            output["story"] = GameModel.currentLocale.Story;
                             GameModel.ShowView(GameModel.GameView.MainGame);
                             GameModel.currentView = GameModel.GameView.MainGame;
                         }
@@ -158,12 +168,12 @@ public class CommandProcessor
 
                     case "help":
                         Debug.Log("Showing Help");
-                        strResult = "Commands: \nback";
+                        output["story"] = "Commands: \nback";
                         break;
 
                     default:
                         Debug.Log("165Do not understand");
-                        strResult = "Do not understand";
+                        output["story"] = "Do not understand";
                         break;
                 }
             }
@@ -171,10 +181,10 @@ public class CommandProcessor
         else
         {
             Debug.Log("173Do not understand");
-            strResult = "Do not understand";
+            output["story"] = "Do not understand";
         }
 
-        return strResult;
+        return output;
 
     }// Parse
 }

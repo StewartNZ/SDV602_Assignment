@@ -41,9 +41,4 @@ public class Location
 
         return thisLocation;
     }
-
-    public override string ToString()
-    {
-        return name + " " + story;
-    }
 }

@@ -6,24 +6,36 @@ public class PanZoom : MonoBehaviour
 {
     Vector3 touchStart;
     Vector3 objectPosStart;
-    GameObject parent;
 
-    public float zoomInMax = 5;
+    RectTransform rectTrans;
+    RectTransform parentTrans;
 
-    Vector3 origPos;
+    Vector3 startPos;
+
+    public float zoomInMax = 3;
 
     // Start is called before the first frame update
     void Start()
     {
-        parent = transform.parent.gameObject;
-        origPos = transform.position;
+        rectTrans = transform.GetComponent<RectTransform>();
+        parentTrans = transform.GetComponentInParent<RectTransform>();
+
+        startPos = new Vector3()
+        {
+            x = 0,
+            y = transform.position.y,
+            z = 0
+        };
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (parent.activeInHierarchy)
+        //if (GameModel.currentView == GameModel.GameView.Map)
+        if (true)
         {
+            zoom(Input.GetAxis("Mouse ScrollWheel"));
+
             if (Input.GetMouseButtonDown(0))
             {
                 //Debug.Log("Touch Started");
@@ -37,25 +49,8 @@ public class PanZoom : MonoBehaviour
                 Vector3 direction = touchStart - worldMousePos;
                 Vector3 newPos = objectPosStart - direction;
 
-                //newPos.x = Mathf.Clamp(newPos.x, -100f / 128f, 100f / 128f);
-                //newPos.y = Mathf.Clamp(newPos.y, -280f / 128f, -80f / 128f);
-
-                if (transform.localScale.x == 1)
-                {
-                    newPos.x = Mathf.Clamp(newPos.x, 0, 0);
-                    newPos.y = Mathf.Clamp(newPos.y, -180f / 128f, -180f / 128f);
-                }
-                else
-                {
-                    float difference = 360f * transform.localScale.x - 360f;
-                    newPos.x = Mathf.Clamp(newPos.x, -difference / 128f, difference / 128f);
-                    newPos.y = Mathf.Clamp(newPos.y, (-difference - 180f) / 128f, (difference - 180f) / 128f);
-                }
-
-                transform.position = newPos;
+                transform.position = clampToParent(newPos);
             }
-
-            zoom(Input.GetAxis("Mouse ScrollWheel"));
         }
     }
 
@@ -71,20 +66,26 @@ public class PanZoom : MonoBehaviour
 
         transform.localScale = newScale;
 
-        Vector3 newPos = transform.position;
+        transform.position = clampToParent(transform.position);
+    }
 
-        if (transform.localScale.x == 1)
-        {
-            newPos.x = Mathf.Clamp(newPos.x, 0, 0);
-            newPos.y = Mathf.Clamp(newPos.y, -180f / 128f, -180f / 128f);
-        }
-        else
-        {
-            float difference = 360f * transform.localScale.x - 360f;
-            newPos.x = Mathf.Clamp(newPos.x, -difference / 128f, difference / 128f);
-            newPos.y = Mathf.Clamp(newPos.y, (-difference - 180f) / 128f, (difference - 180f) / 128f);
-        }
+    Vector3 clampToParent(Vector3 childPos)
+    {
+        Vector3 parentPos = transform.parent.position;
 
-        transform.position = newPos;
+        Vector3 clamps = new Vector3()
+        {
+            x = rectTrans.rect.width / 2 * transform.localScale.x - parentTrans.rect.width / 2,
+            y = rectTrans.rect.height / 2 * transform.localScale.y - parentTrans.rect.height / 2,
+            z = 0
+        };
+
+        // 128 is a local space to world space scaler when camera size is set to 5
+        clamps = clamps / 128;
+
+        childPos.x = Mathf.Clamp(childPos.x, -clamps.x, clamps.x);
+        childPos.y = Mathf.Clamp(childPos.y, -clamps.y + parentPos.y, clamps.y + parentPos.y);
+
+        return childPos;
     }
 }

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class TextInput : MonoBehaviour {
@@ -11,6 +11,7 @@ public class TextInput : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		locationName.text = "Welcome";
         locationStory.text = "Welcome, Type 'help' to see avaliable inputs";
 
         input = this.GetComponent<InputField>();
@@ -29,23 +30,13 @@ public class TextInput : MonoBehaviour {
 
 	private void SubmitInput(string arg0)
 	{
-		string currentText = locationStory.text;
+        CommandProcessor aCmd = new CommandProcessor();
+        Dictionary<string, string> output = aCmd.Parse(arg0);
 
-        //  DO THIS LATER 
-         CommandProcessor aCmd = new CommandProcessor();
-         output.text = aCmd.Parse(arg0);
-
-        //output.text = arg0;
+		locationName.text = output["name"];
+		locationStory.text = output["story"];
 
 		input.text = "";
 		input.ActivateInputField();
-
-
-
-	}
-
-	private void ChangeInput( string arg0)
-	{
-		Debug.Log(arg0);
 	}
 }

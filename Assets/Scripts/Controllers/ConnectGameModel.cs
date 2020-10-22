@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class ConnectGameModel : MonoBehaviour
 {
-    public static GameObject mainGameView;
-    public static GameObject inventoryView;
-    public static GameObject mapView;
+    public static GameObject MainCanvas;
+    public static GameObject HelpCommands;
+    public static GameObject MapCanvas;
 
-    public GameObject _mainGameView;
-    public GameObject _inventoryView;
-    public GameObject _mapView;
+    public GameObject _mainCanvas;
+    public GameObject _helpCommands;
+    public GameObject _mapCanvas;
     
     // Start is called before the first frame update
     void Start()
     {
-        mainGameView = _mainGameView;
-        inventoryView = _inventoryView;
-        mapView = _mapView;
+        MainCanvas = _mainCanvas;
+        HelpCommands = _helpCommands;
+        MapCanvas = _mapCanvas;
 
         GameModel.Name = "The Game Name";
         GameModel.MakeGame();
