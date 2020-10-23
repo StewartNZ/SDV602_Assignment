@@ -31,8 +31,8 @@ public class PanZoom : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if (GameModel.currentView == GameModel.GameView.Map)
-        if (true)
+        if (GameModel.currentView == GameModel.GameView.Map)
+        //if (true)
         {
             zoom(Input.GetAxis("Mouse ScrollWheel"));
 

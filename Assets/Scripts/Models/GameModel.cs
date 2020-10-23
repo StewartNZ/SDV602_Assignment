@@ -9,6 +9,7 @@ using System.IO;
 
 using System.Text;
 using System.Transactions;
+using UnityEngine.UI;
 
 // Is this a factory?
 
@@ -31,6 +32,23 @@ public static class GameModel
     public static Location currentLocale;
     public static Player currentPlayer;
     public static GameView currentView = GameView.MainGame;
+
+    private static string[] mainGameHelpCommands = new string[]
+    {
+        "- go (north/south/east/west)",
+        "- show (map/inventory)",
+        "- current (story)"
+    };
+
+    private static string[] inventoryHelpCommands = new string[]
+    {
+        "- back"
+    };
+
+    private static string[] mapHelpCommands = new string[]
+    {
+        "- back"
+    };
 
     public enum GameView
     {
@@ -77,15 +95,20 @@ public static class GameModel
         {
             ConnectGameModel.MainCanvas.SetActive(true);
             ConnectGameModel.MapCanvas.SetActive(false);
+            ConnectGameModel.InventoryCanvas.SetActive(false);
+
+            UpdateHelpCommands(mainGameHelpCommands);
 
             currentView = GameView.MainGame;
             Debug.Log("MainView");
         }
         else if (prGameView == GameView.Inventory)
         {
-            //ConnectGameModel.mainGameView.SetActive(false);
-            //ConnectGameModel.inventoryView.SetActive(true);
-            //ConnectGameModel.mapView.SetActive(false);
+            ConnectGameModel.MainCanvas.SetActive(false);
+            ConnectGameModel.MapCanvas.SetActive(false);
+            ConnectGameModel.InventoryCanvas.SetActive(true);
+
+            UpdateHelpCommands(inventoryHelpCommands);
 
             currentView = GameView.Inventory;
             Debug.Log("MainView");
@@ -94,6 +117,9 @@ public static class GameModel
         {
             ConnectGameModel.MainCanvas.SetActive(false);
             ConnectGameModel.MapCanvas.SetActive(true);
+            ConnectGameModel.InventoryCanvas.SetActive(false);
+
+            UpdateHelpCommands(mapHelpCommands);
 
             currentView = GameView.Map;
             Debug.Log("MainView");
@@ -102,7 +128,18 @@ public static class GameModel
 
     public static void ToggleHelp()
     {
-        ConnectGameModel.HelpCommands.SetActive(ConnectGameModel.HelpCommands.activeInHierarchy ? false : true);
+        ConnectGameModel.HelpCommandsCanvas.SetActive(ConnectGameModel.HelpCommandsCanvas.activeInHierarchy ? false : true);
+    }
+
+    private static void UpdateHelpCommands(string[] commands)
+    {
+        StringBuilder helpCommands = new StringBuilder();
+        foreach (string line in commands)
+        {
+            helpCommands.AppendLine(line);
+        }
+
+        ConnectGameModel.HelpCommands.text = helpCommands.ToString();
     }
 
 }
