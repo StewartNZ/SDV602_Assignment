@@ -167,8 +167,9 @@ public class CommandProcessor
                         break;
 
                     case "help":
-                        Debug.Log("Showing Help");
-                        output["story"] = "Commands: \nback";
+                        Debug.Log("Toggling Help");
+                        output["story"] = "Showing help";
+                        GameModel.ToggleHelp();
                         break;
 
                     default:

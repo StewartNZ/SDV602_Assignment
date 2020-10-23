@@ -99,6 +99,10 @@ public static class GameModel
 
             UpdateHelpCommands(mainGameHelpCommands);
 
+            InputField currentInput = ConnectGameModel.MainCanvas.GetComponentInChildren<InputField>();
+            currentInput.Select();
+            currentInput.ActivateInputField();
+
             currentView = GameView.MainGame;
             Debug.Log("MainView");
         }
@@ -110,6 +114,10 @@ public static class GameModel
 
             UpdateHelpCommands(inventoryHelpCommands);
 
+            InputField currentInput = ConnectGameModel.InventoryCanvas.GetComponentInChildren<InputField>();
+            currentInput.Select();
+            currentInput.ActivateInputField();
+
             currentView = GameView.Inventory;
             Debug.Log("MainView");
         }
@@ -120,6 +128,10 @@ public static class GameModel
             ConnectGameModel.InventoryCanvas.SetActive(false);
 
             UpdateHelpCommands(mapHelpCommands);
+
+            InputField currentInput = ConnectGameModel.MapCanvas.GetComponentInChildren<InputField>();
+            currentInput.Select();
+            currentInput.ActivateInputField();
 
             currentView = GameView.Map;
             Debug.Log("MainView");
