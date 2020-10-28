@@ -18,140 +18,65 @@ public static class GameModel
 
 	static String _name;
 
-	public static string Name{
-		get 
-		{ 
-			return _name;  
-		}
-		set{
-			_name = value; 
-		}
+    public static string Name { get => _name; set => _name = value; }
 
-	}
-
-    public static Location currentLocale;
     public static Player currentPlayer;
-    public static GameView currentView = GameView.MainGame;
+    public static Location currentLocale;
 
-    private static string[] mainGameHelpCommands = new string[]
-    {
-        "- go (north/south/east/west)",
-        "- show (map/inventory)",
-        "- current (story)"
-    };
+    public static DataService ds = new DataService("AssignmentDatabase.db");
 
-    private static string[] inventoryHelpCommands = new string[]
-    {
-        "- back"
-    };
-
-    private static string[] mapHelpCommands = new string[]
-    {
-        "- back"
-    };
-
-    public enum GameView
-    {
-        MainGame,
-        Inventory,
-        Map
-    }
 
     public static void MakeGame()
     {
-        ShowView(GameView.MainGame);
+        ViewController.ShowView(ViewController.GameView.Login);
+        ds.CreateTables();
 
-        Location forest = new Location
+        if (!ds.HaveLocations())
         {
-            Name = "Forest",
-            Story = "Run!!"
-        };
+            Location forest = Location.New("Forest", "Run!!");
+            Location castle = Location.New("Castle", "Crocodiles");
+            Location swamp = Location.New("Swamp", "Slimy");
 
-        Location castle = new Location
-        {
-            Name = "Castle",
-            Story = "Crocodiles"
-        };
+            forest.AddConnection(castle, "North");
+            castle.AddConnection(forest, "South");
 
-        Location swamp = new Location
-        {
-            Name = "Swamp",
-            Story = "Slimy"
-        };
+            forest.AddConnection(swamp, "South");
+            swamp.AddConnection(forest, "North");
+            
+        }
 
-        currentLocale = forest;
+        //if (ds.HavePlayers())
+        //{
+        //    currentPlayer = ds.GetPlayer(1);
+        //    currentLocale = ds.GetLocation(currentPlayer.LocationID);
+        //} 
+        //else 
+        //{
+        //    currentPlayer = Player.New("PlayerOne", "Password");
 
-        forest.addLocation("North", castle);
-        castle.addLocation("South", forest);
-
-        forest.addLocation("South", swamp);
-        swamp.addLocation("North", forest);
-
+        //    currentLocale = ds.GetLocation(currentPlayer.LocationID);
+        //}
     }
 
-    public static void ShowView(GameView prGameView)
+    public static void ChangePlayer(Player player)
     {
-        if (prGameView == GameView.MainGame)
-        {
-            ConnectGameModel.MainCanvas.SetActive(true);
-            ConnectGameModel.MapCanvas.SetActive(false);
-            ConnectGameModel.InventoryCanvas.SetActive(false);
-
-            UpdateHelpCommands(mainGameHelpCommands);
-
-            InputField currentInput = ConnectGameModel.MainCanvas.GetComponentInChildren<InputField>();
-            currentInput.Select();
-            currentInput.ActivateInputField();
-
-            currentView = GameView.MainGame;
-            Debug.Log("MainView");
-        }
-        else if (prGameView == GameView.Inventory)
-        {
-            ConnectGameModel.MainCanvas.SetActive(false);
-            ConnectGameModel.MapCanvas.SetActive(false);
-            ConnectGameModel.InventoryCanvas.SetActive(true);
-
-            UpdateHelpCommands(inventoryHelpCommands);
-
-            InputField currentInput = ConnectGameModel.InventoryCanvas.GetComponentInChildren<InputField>();
-            currentInput.Select();
-            currentInput.ActivateInputField();
-
-            currentView = GameView.Inventory;
-            Debug.Log("MainView");
-        }
-        else if (prGameView == GameView.Map)
-        {
-            ConnectGameModel.MainCanvas.SetActive(false);
-            ConnectGameModel.MapCanvas.SetActive(true);
-            ConnectGameModel.InventoryCanvas.SetActive(false);
-
-            UpdateHelpCommands(mapHelpCommands);
-
-            InputField currentInput = ConnectGameModel.MapCanvas.GetComponentInChildren<InputField>();
-            currentInput.Select();
-            currentInput.ActivateInputField();
-
-            currentView = GameView.Map;
-            Debug.Log("MainView");
-        }
+        currentPlayer = player;
+        ds.SavePlayer(currentPlayer);
+        currentLocale = ds.GetLocation(currentPlayer.LocationID);
     }
 
-    public static void ToggleHelp()
+    public static bool TryMove(string direction)
     {
-        ConnectGameModel.HelpCommandsCanvas.SetActive(ConnectGameModel.HelpCommandsCanvas.activeInHierarchy ? false : true);
-    }
-
-    private static void UpdateHelpCommands(string[] commands)
-    {
-        StringBuilder helpCommands = new StringBuilder();
-        foreach (string line in commands)
+        Location nextLocale = currentLocale.GetConnection(direction);
+        if (nextLocale == null)
         {
-            helpCommands.AppendLine(line);
+            return false;
+        } else
+        {
+            currentPlayer.Move(nextLocale.Id);
+            currentLocale = nextLocale;
+            return true;
         }
-
-        ConnectGameModel.HelpCommands.text = helpCommands.ToString();
     }
 
 }

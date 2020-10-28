@@ -1,44 +1,52 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using SQLite4Unity3d;
 
 public class Location 
 {
-    private string name;
-    private string story;
+    private string _name;
+    private string _story;
 
     // what about location assests??
 
-    private Dictionary<string, Location> Locations = new Dictionary<string, Location>();
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+    public string Name { get => _name; set => _name = value; }
+    public string Story { get => _story; set => _story = value; }
 
-    public string Name { get => name; set => name = value; }
-    public string Story { get => story; set => story = value; }
-
-    public void addLocation(string pDirection ,string pName, string pStory)
+    public static Location New(string name, string story)
     {
-        Location newLocation = new Location
+        Location location = new Location
         {
-            Name = pName,
-            Story = pStory
+            Name = name,
+            Story = story
+        };
+        location = GameModel.ds.SaveLocation(location);
+        return location;
+    }
+
+    public void AddConnection(Location location, string direction)
+    {
+        LocationConnection connection = new LocationConnection
+        {
+            FromId = this.Id,
+            Direction = direction,
+            ToId = location.Id
         };
 
-        Locations.Add(pDirection, newLocation);
-
+        GameModel.ds.SaveLocationConnection(connection);
     }
 
-    public  void addLocation(string pDirection, Location pLocation)
+    public Location GetConnection(string direction)
     {
-        Locations.Add(pDirection, pLocation);
+        return GameModel.ds.GetConnection(this.Id, direction);
     }
+}
 
-    public Location getLocation(string pDirection)
-    {
-        Location thisLocation = null;
-        
-        if(! Locations.TryGetValue(pDirection, out thisLocation)) {
-            Debug.Log(" Bad location");
-        }
-
-        return thisLocation;
-    }
+public class LocationConnection
+{
+    public int FromId { get; set; }
+    public string Direction { get; set; }
+    public int ToId { get; set; }
 }

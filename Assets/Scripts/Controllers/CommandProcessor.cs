@@ -22,11 +22,10 @@ public class CommandProcessor
 
         pCmdStr = pCmdStr.ToLower();
         String[] parts = pCmdStr.Split(' '); // tokenise the command
-        Location nextLocale;
 
         if (parts.Length > 0)
         {// process the tokens
-            if (GameModel.currentView == GameModel.GameView.MainGame)
+            if (ViewController.currentView == ViewController.GameView.MainGame)
             {
                 switch (parts[0])
                 {
@@ -48,60 +47,54 @@ public class CommandProcessor
                         {
                             case "north":
                                 Debug.Log("Got go North");
-                                nextLocale = GameModel.currentLocale.getLocation("North");
-                                if (nextLocale == null)
-                                    output["story"] = "Sorry can't go north";
-                                else
+                                if (GameModel.TryMove("North"))
                                 {
-                                    GameModel.currentLocale = nextLocale;
                                     output["name"] = GameModel.currentLocale.Name;
                                     output["story"] = GameModel.currentLocale.Story;
+                                }
+                                else
+                                {
+                                    output["story"] = "Sorry can't go north";
                                 }
 
                                 break;
 
                             case "south":
                                 Debug.Log("Got go South");
-                                nextLocale = GameModel.currentLocale.getLocation("South");
-                                if (nextLocale == null)
+                                if (GameModel.TryMove("South"))
                                 {
-                                    output["story"] = "Sorry can't go South";
+                                    output["name"] = GameModel.currentLocale.Name;
+                                    output["story"] = GameModel.currentLocale.Story;
                                 }
                                 else
                                 {
-                                    GameModel.currentLocale = nextLocale;
-                                    output["name"] = GameModel.currentLocale.Name;
-                                    output["story"] = GameModel.currentLocale.Story;
+                                    output["story"] = "Sorry can't go south";
                                 }
                                 break;
 
                             case "east":
                                 Debug.Log("Got go East");
-                                nextLocale = GameModel.currentLocale.getLocation("East");
-                                if (nextLocale == null)
+                                if (GameModel.TryMove("East"))
                                 {
-                                    output["story"] = "Sorry can't go East";
+                                    output["name"] = GameModel.currentLocale.Name;
+                                    output["story"] = GameModel.currentLocale.Story;
                                 }
                                 else
                                 {
-                                    GameModel.currentLocale = nextLocale;
-                                    output["name"] = GameModel.currentLocale.Name;
-                                    output["story"] = GameModel.currentLocale.Story;
+                                    output["story"] = "Sorry can't go east";
                                 }
                                 break;
 
                             case "west":
                                 Debug.Log("Got go West");
-                                nextLocale = GameModel.currentLocale.getLocation("West");
-                                if (nextLocale == null)
+                                if (GameModel.TryMove("West"))
                                 {
-                                    output["story"] = "Sorry can't go West";
+                                    output["name"] = GameModel.currentLocale.Name;
+                                    output["story"] = GameModel.currentLocale.Story;
                                 }
                                 else
                                 {
-                                    GameModel.currentLocale = nextLocale;
-                                    output["name"] = GameModel.currentLocale.Name;
-                                    output["story"] = GameModel.currentLocale.Story;
+                                    output["story"] = "Sorry can't go west";
                                 }
                                 break;
 
@@ -118,13 +111,13 @@ public class CommandProcessor
                             case "inventory":
                                 Debug.Log("Showing Inventory");
                                 output["story"] = "Showing Inventory";
-                                GameModel.ShowView(GameModel.GameView.Inventory);
+                                ViewController.ShowView(ViewController.GameView.Inventory);
                                 break;
 
                             case "map":
                                 Debug.Log("Showing Map");
                                 output["story"] = "Showing Map";
-                                GameModel.ShowView(GameModel.GameView.Map);
+                                ViewController.ShowView(ViewController.GameView.Map);
                                 break;
 
                             default:
@@ -137,7 +130,7 @@ public class CommandProcessor
                     case "help":
                         Debug.Log("Toggling Help");
                         output["story"] = "Showing help";
-                        GameModel.ToggleHelp();
+                        ViewController.ToggleHelp();
                         break;
 
                     default:
@@ -152,7 +145,7 @@ public class CommandProcessor
                 switch (parts[0])
                 {
                     case "back":
-                        if (GameModel.currentView == GameModel.GameView.MainGame)
+                        if (ViewController.currentView == ViewController.GameView.MainGame)
                         {
                             Debug.Log("Cannot go back further");
                             output["story"] = "Cannot go back further";
@@ -161,15 +154,15 @@ public class CommandProcessor
                         {
                             Debug.Log("Returning to Main View");
                             output["story"] = GameModel.currentLocale.Story;
-                            GameModel.ShowView(GameModel.GameView.MainGame);
-                            GameModel.currentView = GameModel.GameView.MainGame;
+                            ViewController.ShowView(ViewController.GameView.MainGame);
+                            ViewController.currentView = ViewController.GameView.MainGame;
                         }
                         break;
 
                     case "help":
                         Debug.Log("Toggling Help");
                         output["story"] = "Showing help";
-                        GameModel.ToggleHelp();
+                        ViewController.ToggleHelp();
                         break;
 
                     default:
