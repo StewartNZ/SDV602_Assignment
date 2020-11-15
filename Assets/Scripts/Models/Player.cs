@@ -1,17 +1,17 @@
 ﻿using UnityEngine;
 using System.Collections;
 using SQLite4Unity3d;
+using System;
 
+[Serializable]
 public class Player 
 {
 
     private string _name;
     private string _password;
     private int _health;
-    // what about inventory?
 
-    [PrimaryKey, AutoIncrement]
-    public int Id { get; set; }
+    [PrimaryKey]
     public string Name { get => _name; set => _name = value; }
     public string Password { get => _password; set => _password = value; }
     public int LocationID { get; set; }
@@ -21,6 +21,7 @@ public class Player
     {
         LocationID = locationId;
         GameModel.ds.SavePlayer(this);
+        GameModel.ds.StorePlayerToJsn(this);
     }
 
     public static Player New(string name, string password)

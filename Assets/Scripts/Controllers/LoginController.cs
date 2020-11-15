@@ -49,6 +49,7 @@ public class LoginController : MonoBehaviour
             {
                 Player newPlayer = Player.New(username, password);
                 GameModel.ChangePlayer(newPlayer);
+                GameModel.ds.StorePlayerToJsn(newPlayer);
                 ViewController.ShowView(ViewController.GameView.MainGame);
             }
             else

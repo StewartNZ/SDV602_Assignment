@@ -1,6 +1,9 @@
 ﻿using SQLite4Unity3d;
 using UnityEngine;
+using System.Timers;
 using System.Linq;
+using System.Threading.Tasks;
+using System;
 // DataService is a bridge to SQlite 
 // =================================
 #if !UNITY_EDITOR
@@ -9,9 +12,12 @@ using System.IO;
 #endif
 using System.Collections.Generic;
 
-public class DataService {
+public class DataService { 
 
     private SQLiteConnection _connection;
+    public SQLiteConnection Connection { get => _connection; }
+
+    JSONDropService jsnDrop = new JSONDropService { Token = "499a8449-6e83-447b-9678-8e41f6161a5c" };
 
     public DataService(string DatabaseName) {
 
@@ -67,75 +73,107 @@ public class DataService {
 
     }
 
+    private void jsnReceiverDel(JsnReceiver pReceived)
+    {
+        Debug.Log(pReceived.JsnMsg + " ... " + pReceived.Msg);
+        // To do: parse and produce an appropriate response
+    }
+
+    private void jsnReceivePlayers(List<Player> recievedPlayers)
+    {
+        foreach (Player player in recievedPlayers)
+        {
+            SavePlayer(player);
+        }
+    }
 
     public void CreateTables()
     {
         //_connection.DropTable<Location>();
         //_connection.DropTable<LocationConnection>();
-        //_connection.DropTable<Player>();
+        _connection.DropTable<Player>();
 
-        _connection.CreateTable<Location>();
-        _connection.CreateTable<LocationConnection>();
-        _connection.CreateTable<Player>();
+        //jsnDrop.Drop<Player>(jsnReceiverDel);
+
+        Connection.CreateTable<Location>();
+        Connection.CreateTable<LocationConnection>();
+        Connection.CreateTable<Player>();
+
+        //jsnDrop.Create<Player>(new Player
+        //{
+        //    Name = "UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU",
+        //    Password = "**************************************************",
+        //    LocationID = 0,
+        //    Health = 0
+        //}, jsnReceiverDel);
+
+        jsnDrop.All<Player, JsnReceiver>(jsnReceivePlayers, jsnReceiverDel);
     }
 
     public Location SaveLocation(Location location)
     {
-        _connection.Insert(location);
+        Connection.Insert(location);
         return location;
     }
 
     public void SaveLocationConnection(LocationConnection connection)
     {
-        _connection.Insert(connection);
+        Connection.Insert(connection);
     }
 
     public Location GetLocation(int id)
     {
-        return _connection.Table<Location>().Where(l => l.Id == id).FirstOrDefault();
+        return Connection.Table<Location>().Where(l => l.Id == id).FirstOrDefault();
     }
 
     public Location GetFirstLocation()
     {
-        return _connection.Table<Location>().FirstOrDefault();
+        return Connection.Table<Location>().FirstOrDefault();
     }
 
     public Location GetConnection(int currentId, string direction)
     {
-        LocationConnection connection = _connection.Table<LocationConnection>().Where(lc => lc.FromId == currentId && lc.Direction == direction).FirstOrDefault();
-        return GetLocation(connection.ToId);
+        LocationConnection connection = Connection.Table<LocationConnection>().Where(lc => lc.FromId == currentId && lc.Direction == direction).FirstOrDefault();
+        if (connection == null)
+        {
+            return null;
+        }
+        else
+        {
+            return GetLocation(connection.ToId);
+        }
     }
 
     public bool HaveLocations ()
     {
-        return _connection.Table<Location>().Count() > 0;
+        return Connection.Table<Location>().Count() > 0;
     }
 
     public Player SavePlayer(Player player)
     {
-        Player receive = _connection.Table<Player>().Where(l => l.Id == player.Id).FirstOrDefault();
+        Player receive = Connection.Table<Player>().Where(p => p.Name == player.Name).FirstOrDefault();
         if (receive == null)
         {
-            _connection.Insert(player);
+            Connection.Insert(player);
         } else
         {
-            _connection.Update(player);
+            Connection.Update(player);
         }
         return player;
     }
 
-    public Player GetPlayer(int id)
+    public void StorePlayerToJsn(Player player)
     {
-        return _connection.Table<Player>().Where(l => l.Id == id).FirstOrDefault();
+        jsnDrop.Store<Player>(player, jsnReceiverDel);
     }
 
     public Player GetPlayer(string username)
     {
-        return _connection.Table<Player>().Where(l => l.Name == username).FirstOrDefault();
+        return Connection.Table<Player>().Where(l => l.Name == username).FirstOrDefault();
     }
 
     public bool HavePlayers()
     {
-        return _connection.Table<Player>().Count() > 0;
+        return Connection.Table<Player>().Count() > 0;
     }
 }
