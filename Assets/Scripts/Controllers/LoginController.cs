@@ -10,15 +10,26 @@ public class LoginController : MonoBehaviour
     public InputField usernameField;
     public InputField passwordField;
 
-    public void TryLogin()
+    public TextInput mainGameInput;
+
+    public void LoginButton()
     {
-        Player player = GameModel.ds.GetPlayer(usernameField.text.ToLower());
+        GameModel.ds.GetPlayer(usernameField.text.ToLower(), TryLogin, GameModel.ds.jsnReceiverDel);
+    }
+
+    public void TryLogin(List<Player> players)
+    {
+        //Player player = GameModel.ds.GetPlayer(usernameField.text.ToLower());
+        GameModel.waitingOn -= 1;
+        Player player = players[0];
+
         if (player != null)
         {
             if (player.Password == passwordField.text)
             {
                 GameModel.ChangePlayer(player);
                 ViewController.ShowView(ViewController.GameView.MainGame);
+                mainGameInput.UpdateLocation();
             }
             else
             {
@@ -31,8 +42,15 @@ public class LoginController : MonoBehaviour
         }
     }
 
-    public void TryRegister()
+    public void RegisterButton()
     {
+        GameModel.ds.GetPlayer(usernameField.text.ToLower(), TryLogin, TryRegister);
+    }
+
+    public void TryRegister(JsnReceiver receiver)
+    {
+        GameModel.waitingOn -= 1;
+
         string username = usernameField.text.Trim();
         username = username.ToLower();
 
@@ -44,18 +62,11 @@ public class LoginController : MonoBehaviour
         }
         else
         {
-            Player player = GameModel.ds.GetPlayer(username);
-            if (player == null)
-            {
-                Player newPlayer = Player.New(username, password);
-                GameModel.ChangePlayer(newPlayer);
-                GameModel.ds.StorePlayerToJsn(newPlayer);
-                ViewController.ShowView(ViewController.GameView.MainGame);
-            }
-            else
-            {
-                output.text = "Username already taken";
-            }
+            Player newPlayer = Player.New(username, password);
+            GameModel.ChangePlayer(newPlayer);
+            //GameModel.ds.StorePlayerToJsn(newPlayer);
+            ViewController.ShowView(ViewController.GameView.MainGame);
+            mainGameInput.UpdateLocation();
         }
     }
 }

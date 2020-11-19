@@ -10,7 +10,7 @@ public class TextInput : MonoBehaviour {
 	public Text locationStory;
 
 	// Use this for initialization
-	void Start () {
+	void Awake () {
 		locationName.text = "Welcome";
         locationStory.text = "Welcome, Type 'help' to see avaliable inputs";
 
@@ -18,6 +18,12 @@ public class TextInput : MonoBehaviour {
 
     }
 	
+	public void UpdateLocation()
+    {
+		locationName.text = GameModel.currentLocale.Name;
+		locationStory.text = GameModel.currentLocale.Story + "\n\nYour sensors tell you there are " + GameModel.currentLocale.NumOfPlayers + " ships in orbit";
+	}
+
 	// Update is called once per frame
 	
 	void Update () {
@@ -38,5 +44,10 @@ public class TextInput : MonoBehaviour {
 
 		input.text = "";
 		input.ActivateInputField();
+
+        Canvas.ForceUpdateCanvases();
+
+        locationStory.transform.parent.GetComponent<HorizontalLayoutGroup>().enabled = false; // **
+		locationStory.transform.parent.GetComponent<HorizontalLayoutGroup>().enabled = true;
 	}
 }

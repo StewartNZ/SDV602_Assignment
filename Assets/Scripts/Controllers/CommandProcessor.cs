@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 using System.IO;
+using System.Text;
 
 public class CommandProcessor
 {
@@ -20,6 +21,8 @@ public class CommandProcessor
             {"story", "Do not understand"}
         };
 
+        StringBuilder story = new StringBuilder();
+
         pCmdStr = pCmdStr.ToLower();
         String[] parts = pCmdStr.Split(' '); // tokenise the command
 
@@ -29,17 +32,11 @@ public class CommandProcessor
             {
                 switch (parts[0])
                 {
-                    case "current":
-                        switch (parts[1])
-                        {
-                            case "story":
-                                Debug.Log("Telling Current Story");
-                                output["story"] = GameModel.currentLocale.Story;
-                                break;
-
-                            default:
-                                break;
-                        }
+                    case "story":
+                        Debug.Log("Telling Current Story");
+                        story.AppendLine(GameModel.currentLocale.Story); 
+                        story.AppendLine("\nYour sensors tell you there are " + GameModel.currentLocale.NumOfPlayers + " ships in orbit");
+                        //output["story"] = GameModel.currentLocale.Story;
                         break;
 
                     case "go":
@@ -50,11 +47,14 @@ public class CommandProcessor
                                 if (GameModel.TryMove("North"))
                                 {
                                     output["name"] = GameModel.currentLocale.Name;
-                                    output["story"] = GameModel.currentLocale.Story;
+                                    //output["story"] = GameModel.currentLocale.Story;
+                                    story.AppendLine(GameModel.currentLocale.Story);
+                                    story.AppendLine("\nAs you arrive you see " + GameModel.currentLocale.NumOfPlayers + " ships in orbit on your sensors");
                                 }
                                 else
                                 {
-                                    output["story"] = "Sorry can't go north";
+                                    story.AppendLine("Sorry can't go north");
+                                    //output["story"] = "Sorry can't go north";
                                 }
 
                                 break;
@@ -64,11 +64,14 @@ public class CommandProcessor
                                 if (GameModel.TryMove("South"))
                                 {
                                     output["name"] = GameModel.currentLocale.Name;
-                                    output["story"] = GameModel.currentLocale.Story;
+                                    //output["story"] = GameModel.currentLocale.Story;
+                                    story.AppendLine(GameModel.currentLocale.Story);
+                                    story.AppendLine("\nAs you arrive you see " + GameModel.currentLocale.NumOfPlayers + " ships in orbit on your sensors");
                                 }
                                 else
                                 {
-                                    output["story"] = "Sorry can't go south";
+                                    story.AppendLine("Sorry can't go south");
+                                    //output["story"] = "Sorry can't go south";
                                 }
                                 break;
 
@@ -77,11 +80,14 @@ public class CommandProcessor
                                 if (GameModel.TryMove("East"))
                                 {
                                     output["name"] = GameModel.currentLocale.Name;
-                                    output["story"] = GameModel.currentLocale.Story;
+                                    //output["story"] = GameModel.currentLocale.Story;
+                                    story.AppendLine(GameModel.currentLocale.Story);
+                                    story.AppendLine("\nAs you arrive you see " + GameModel.currentLocale.NumOfPlayers + " ships in orbit on your sensors");
                                 }
                                 else
                                 {
-                                    output["story"] = "Sorry can't go east";
+                                    story.AppendLine("Sorry can't go east");
+                                    //output["story"] = "Sorry can't go east";
                                 }
                                 break;
 
@@ -90,11 +96,14 @@ public class CommandProcessor
                                 if (GameModel.TryMove("West"))
                                 {
                                     output["name"] = GameModel.currentLocale.Name;
-                                    output["story"] = GameModel.currentLocale.Story;
+                                    //output["story"] = GameModel.currentLocale.Story;
+                                    story.AppendLine(GameModel.currentLocale.Story);
+                                    story.AppendLine("\nAs you arrive you see " + GameModel.currentLocale.NumOfPlayers + " ships in orbit on your sensors");
                                 }
                                 else
                                 {
-                                    output["story"] = "Sorry can't go west";
+                                    story.AppendLine("Sorry can't go west");
+                                    //output["story"] = "Sorry can't go west";
                                 }
                                 break;
 
@@ -105,31 +114,24 @@ public class CommandProcessor
                         }// end switch
                         break;
 
-                    case "show":
-                        switch (parts[1])
-                        {
-                            case "inventory":
-                                Debug.Log("Showing Inventory");
-                                output["story"] = "Showing Inventory";
-                                ViewController.ShowView(ViewController.GameView.Inventory);
-                                break;
+                    case "inventory":
+                        Debug.Log("Showing Inventory");
+                        story.AppendLine("Showing Inventory");
+                        //output["story"] = "Showing Inventory";
+                        ViewController.ShowView(ViewController.GameView.Inventory);
+                        break;
 
-                            case "map":
-                                Debug.Log("Showing Map");
-                                output["story"] = "Showing Map";
-                                ViewController.ShowView(ViewController.GameView.Map);
-                                break;
-
-                            default:
-                                Debug.Log("Do not know how to show that");
-                                output["story"] = "Do not know how to show that";
-                                break;
-                        }
+                    case "map":
+                        Debug.Log("Showing Map");
+                        story.AppendLine("Showing Map");
+                        //output["story"] = "Showing Map";
+                        ViewController.ShowView(ViewController.GameView.Map);
                         break;
 
                     case "help":
                         Debug.Log("Toggling Help");
-                        output["story"] = "Showing help";
+                        story.AppendLine("Showing Help");
+                        //output["story"] = "Showing help";
                         ViewController.ToggleHelp();
                         break;
 
@@ -153,7 +155,9 @@ public class CommandProcessor
                         else
                         {
                             Debug.Log("Returning to Main View");
-                            output["story"] = GameModel.currentLocale.Story;
+                            //output["story"] = GameModel.currentLocale.Story;
+                            story.AppendLine(GameModel.currentLocale.Story);
+                            story.AppendLine("\nYour sensors tell you there are " + GameModel.currentLocale.NumOfPlayers + " ships in orbit");
                             ViewController.ShowView(ViewController.GameView.MainGame);
                             ViewController.currentView = ViewController.GameView.MainGame;
                         }
@@ -161,7 +165,8 @@ public class CommandProcessor
 
                     case "help":
                         Debug.Log("Toggling Help");
-                        output["story"] = "Showing help";
+                        story.AppendLine("Showing Help");
+                        //output["story"] = "Showing help";
                         ViewController.ToggleHelp();
                         break;
 
@@ -177,6 +182,9 @@ public class CommandProcessor
             Debug.Log("173Do not understand");
             output["story"] = "Do not understand";
         }
+
+        if (story.Length > 0)
+            output["story"] = story.ToString().Trim();
 
         return output;
 

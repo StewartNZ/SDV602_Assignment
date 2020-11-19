@@ -14,6 +14,7 @@ public class Location
     public int Id { get; set; }
     public string Name { get => _name; set => _name = value; }
     public string Story { get => _story; set => _story = value; }
+    public int NumOfPlayers { get; set; }
 
     public static Location New(string name, string story)
     {

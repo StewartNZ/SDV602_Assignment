@@ -20,7 +20,8 @@ public class Player
     public void Move(int locationId)
     {
         LocationID = locationId;
-        GameModel.ds.SavePlayer(this);
+        //GameModel.ds.SavePlayer(this);
+        GameModel.ds.UpdateNumPlayersAtLocale();
         GameModel.ds.StorePlayerToJsn(this);
     }
 
@@ -33,7 +34,8 @@ public class Player
             Health = 100,
             Password = password
         };
-        GameModel.ds.SavePlayer(player);
+        //GameModel.ds.SavePlayer(player);
+        GameModel.ds.StorePlayerToJsn(player);
         return player;
     }
 }

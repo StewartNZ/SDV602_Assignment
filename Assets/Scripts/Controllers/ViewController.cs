@@ -53,8 +53,9 @@ public class ViewController : MonoBehaviour
     private static string[] mainGameHelpCommands = new string[]
     {
         "- go (north/south/east/west)",
-        "- show (map/inventory)",
-        "- current (story)"
+        "- map",
+        "- inventory",
+        "- story"
     };
 
     private static string[] inventoryHelpCommands = new string[]

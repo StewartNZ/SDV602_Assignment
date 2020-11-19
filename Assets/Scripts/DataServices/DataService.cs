@@ -17,7 +17,7 @@ public class DataService {
     private SQLiteConnection _connection;
     public SQLiteConnection Connection { get => _connection; }
 
-    JSONDropService jsnDrop = new JSONDropService { Token = "499a8449-6e83-447b-9678-8e41f6161a5c" };
+    public JSONDropService jsnDrop = new JSONDropService { Token = "499a8449-6e83-447b-9678-8e41f6161a5c" };
 
     public DataService(string DatabaseName) {
 
@@ -73,31 +73,39 @@ public class DataService {
 
     }
 
-    private void jsnReceiverDel(JsnReceiver pReceived)
+    public void jsnReceiverDel(JsnReceiver pReceived)
     {
         Debug.Log(pReceived.JsnMsg + " ... " + pReceived.Msg);
+        GameModel.waitingOn -= 1;
         // To do: parse and produce an appropriate response
     }
 
-    private void jsnReceivePlayers(List<Player> recievedPlayers)
+    public void jsnReceiverDel2(JsnReceiver pReceived)
     {
-        foreach (Player player in recievedPlayers)
-        {
-            SavePlayer(player);
-        }
+        Debug.Log(pReceived.JsnMsg + " ... " + pReceived.Msg);
+        GameModel.waitingOn -= 1;
+        // To do: parse and produce an appropriate response
     }
+
+    //private void jsnReceivePlayers(List<Player> recievedPlayers)
+    //{
+    //    foreach (Player player in recievedPlayers)
+    //    {
+    //        SavePlayer(player);
+    //    }
+    //}
 
     public void CreateTables()
     {
         //_connection.DropTable<Location>();
         //_connection.DropTable<LocationConnection>();
-        _connection.DropTable<Player>();
+        //_connection.DropTable<Player>();
 
         //jsnDrop.Drop<Player>(jsnReceiverDel);
 
         Connection.CreateTable<Location>();
         Connection.CreateTable<LocationConnection>();
-        Connection.CreateTable<Player>();
+        //Connection.CreateTable<Player>();
 
         //jsnDrop.Create<Player>(new Player
         //{
@@ -107,7 +115,7 @@ public class DataService {
         //    Health = 0
         //}, jsnReceiverDel);
 
-        jsnDrop.All<Player, JsnReceiver>(jsnReceivePlayers, jsnReceiverDel);
+        //jsnDrop.All<Player, JsnReceiver>(jsnReceivePlayers, jsnReceiverDel);
     }
 
     public Location SaveLocation(Location location)
@@ -149,31 +157,65 @@ public class DataService {
         return Connection.Table<Location>().Count() > 0;
     }
 
-    public Player SavePlayer(Player player)
-    {
-        Player receive = Connection.Table<Player>().Where(p => p.Name == player.Name).FirstOrDefault();
-        if (receive == null)
-        {
-            Connection.Insert(player);
-        } else
-        {
-            Connection.Update(player);
-        }
-        return player;
-    }
+    //public Player SavePlayer(Player player)
+    //{
+    //    Player receive = Connection.Table<Player>().Where(p => p.Name == player.Name).FirstOrDefault();
+    //    if (receive == null)
+    //    {
+    //        Connection.Insert(player);
+    //    } else
+    //    {
+    //        Connection.Update(player);
+    //    }
+    //    return player;
+    //}
 
     public void StorePlayerToJsn(Player player)
     {
+        GameModel.waitingOn += 1;
         jsnDrop.Store<Player>(player, jsnReceiverDel);
     }
 
-    public Player GetPlayer(string username)
+    //public Player GetPlayer(string username)
+    //{
+    //    return Connection.Table<Player>().Where(l => l.Name == username).FirstOrDefault();
+    //}
+
+    public void GetPlayer(string username, ReceiveRecordDelegateList<Player> successAction, ReceiveRecordDelegate<JsnReceiver> failAction)
     {
-        return Connection.Table<Player>().Where(l => l.Name == username).FirstOrDefault();
+        GameModel.waitingOn += 1;
+        jsnDrop.Select<Player, JsnReceiver>("Name = '" + username + "'", successAction, failAction);
     }
 
-    public bool HavePlayers()
+    //public bool HavePlayers()
+    //{
+    //    return Connection.Table<Player>().Count() > 0;
+    //}
+
+    public void UpdateNumPlayersAtLocale()
     {
-        return Connection.Table<Player>().Count() > 0;
+        foreach (Location location in Connection.Table<Location>())
+        {
+            GameModel.waitingOn += 1;
+            location.NumOfPlayers = 0;
+            UpdateLocation(location);
+            jsnDrop.Select<Player, JsnReceiver>("LocationID = " + location.Id, UpdateLocationCount, jsnReceiverDel2);
+        }
+    }
+
+    private void UpdateLocationCount(List<Player> players)
+    {
+        GameModel.waitingOn -= 1;
+        if (players != null)
+        {
+            Location location = GetLocation(players[0].LocationID);
+            location.NumOfPlayers = players.Count;
+            UpdateLocation(location);
+        }
+    }
+
+    private void UpdateLocation(Location location)
+    {
+        Connection.Update(location);
     }
 }

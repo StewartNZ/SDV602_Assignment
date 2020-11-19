@@ -12,4 +12,17 @@ public class ConnectGameModel : MonoBehaviour
         GameModel.MakeGame();
     }
 
+    private void Update()
+    {
+        if (GameModel.waitingOn == 0)
+        {
+            StartNumPlayerUpdate();
+        }
+    }
+
+    private void StartNumPlayerUpdate()
+    {
+        GameModel.ds.UpdateNumPlayersAtLocale();
+    }
+
 }
